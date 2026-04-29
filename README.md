@@ -1,8 +1,8 @@
 # 🌊 Éco-Océan - Application de collecte de données
 
-**TP INF232 EC2 - Divrogbel Kann**
+**TP INF232 EC2 - DivrogbelKann**
 
-🔗 **Lien de l'application** : https://[votre-username].github.io/TP232/
+🔗 **Lien de l'application** : https://[divrogbelkann].github.io/TP232/
 
 ## Fonctionnalités
 - Collecte de données (plage, quantité, type de déchet)
