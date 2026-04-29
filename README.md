@@ -1,2 +1,13 @@
-# TP232
-Application web de collecte de données environnementales (déchets plastiques sur les plages) avec analyse descriptive statistique : moyenne, médiane, fréquences, mode, min/max. Projet réalisé dans le cadre du cours TP INF232 EC2.
+# 🌊 Éco-Océan - Application de collecte de données
+
+**TP INF232 EC2 - Divrogbel Kann**
+
+🔗 **Lien de l'application** : https://[votre-username].github.io/TP232/
+
+## Fonctionnalités
+- Collecte de données (plage, quantité, type de déchet)
+- Analyse descriptive (moyenne, médiane, mode, fréquences)
+- Export CSV
+
+## Technologies
+HTML/CSS/JavaScript - LocalStorage
