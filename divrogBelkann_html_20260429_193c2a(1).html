@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éco-Océan - Collecte de données</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌊 Éco-Océan</h1>
+            <p>Collecte et analyse des déchets plastiques sur les plages</p>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('collecte')">📝 Nouvelle collecte</button>
+                <button class="tab" onclick="showTab('analyse')">📊 Analyse descriptive</button>
+                <button class="tab" onclick="showTab('donnees')">📋 Données collectées</button>
+            </div>
+
+            <!-- Onglet Collecte -->
+            <div id="collecte" class="tab-content active">
+                <h2>Formulaire de collecte</h2>
+                <form id="collectForm">
+                    <div class="form-group">
+                        <label>Nom de la plage *</label>
+                        <input type="text" id="plage" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date de collecte *</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantité de déchets (kg) *</label>
+                        <input type="number" id="quantite" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Type de déchet principal *</label>
+                        <select id="type">
+                            <option value="Bouteilles plastique">Bouteilles plastique</option>
+                            <option value="Sachets plastique">Sachets plastique</option>
+                            <option value="Filets de pêche">Filets de pêche</option>
+                            <option value="Microplastiques">Microplastiques</option>
+                            <option value="Mégots">Mégots</option>
+                            <option value="Autres">Autres</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre de bénévoles</label>
+                        <input type="number" id="benevoles" value="1">
+                    </div>
+                    <button type="submit">✅ Enregistrer la collecte</button>
+                </form>
+                <div id="message" class="success"></div>
+            </div>
+
+            <!-- Onglet Analyse -->
+            <div id="analyse" class="tab-content">
+                <h2>📈 Analyse descriptive des données</h2>
+                <div id="statsContainer">
+                    <p>Chargement des statistiques...</p>
+                </div>
+            </div>
+
+            <!-- Onglet Données -->
+            <div id="donnees" class="tab-content">
+                <h2>📋 Historique des collectes</h2>
+                <div id="tableContainer">
+                    <p>Chargement des données...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Clé API JSONBin (gratuit - à remplacer par votre clé)
+        const JSONBIN_URL = 'https://api.jsonbin.io/v3/b/67b0e8e8acd3cb34a8e8e8e8';
+        const API_KEY = '$2a$10$exempleDeCleApiAChanger';
+        
+        // Utilisation du localStorage comme solution de secours (fonctionne sans API)
+        let useLocalStorage = true;
+        
+        // Initialisation
+        document.getElementById('date').valueAsDate = new Date();
+        
+        // Charger les données au chargement
+        loadAndDisplayStats();
+        loadAndDisplayTable();
+        
+        // Gestion du formulaire
+        document.getElementById('collectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const newData = {
+                id: Date.now(),
+                plage: document.getElementById('plage').value,
+                date: document.getElementById('date').value,
+                quantite: parseFloat(document.getElementById('quantite').value),
+                type: document.getElementById('type').value,
+                benevoles: parseInt(document.getElementById('benevoles').value),
+                timestamp: new Date().toISOString()
+            };
+            
+            // Récupérer les données existantes
+            let existingData = getData();
+            existingData.push(newData);
+            
+            // Sauvegarder
+            if (saveData(existingData)) {
+                document.getElementById('message').style.display = 'block';
+                document.getElementById('message').innerHTML = '✅ Donnée enregistrée avec succès !';
+                setTimeout(() => {
+                    document.getElementById('message').style.display = 'none';
+                }, 3000);
+                
+                // Réinitialiser le formulaire
+                document.getElementById('collectForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                
+                // Mettre à jour les affichages
+                loadAndDisplayStats();
+                loadAndDisplayTable();
+            } else {
+                document.getElementById('message').style.display = 'block';
+                document.getElementById('message').innerHTML = '❌ Erreur lors de l\'enregistrement';
+                document.getElementById('message').style.backgroundColor = '#f8d7da';
+                document.getElementById('message').style.color = '#721c24';
+            }
+        });
+        
+        // Fonctions de gestion des données
+        function getData() {
+            const stored = localStorage.getItem('ecoOceanData');
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            return [];
+        }
+        
+        function saveData(data) {
+            try {
+                localStorage.setItem('ecoOceanData', JSON.stringify(data));
+                return true;
+            } catch(e) {
+                return false;
+            }
+        }
+        
+        // Statistiques descriptives
+        function calculateStats(data) {
+            if (data.length === 0) return null;
+            
+            const quantites = data.map(d => d.quantite).sort((a,b) => a-b);
+            const sum = quantites.reduce((a,b) => a+b, 0);
+            const mean = sum / data.length;
+            
+            // Médiane
+            let median;
+            const mid = Math.floor(quantites.length / 2);
+            if (quantites.length % 2 === 0) {
+                median = (quantites[mid-1] + quantites[mid]) / 2;
+            } else {
+                median = quantites[mid];
+            }
+            
+            // Mode (type le plus fréquent)
+            const typeCount = {};
+            data.forEach(d => {
+                typeCount[d.type] = (typeCount[d.type] || 0) + 1;
+            });
+            let mode = null;
+            let maxCount = 0;
+            for (let [type, count] of Object.entries(typeCount)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    mode = type;
+                }
+            }
+            
+            // Statistiques par plage
+            const plageStats = {};
+            data.forEach(d => {
+                if (!plageStats[d.plage]) {
+                    plageStats[d.plage] = { total: 0, count: 0 };
+                }
+                plageStats[d.plage].total += d.quantite;
+                plageStats[d.plage].count += 1;
+            });
+            
+            return {
+                totalObservations: data.length,
+                totalDechets: sum,
+                moyenne: mean.toFixed(2),
+                mediane: median.toFixed(2),
+                min: Math.min(...quantites),
+                max: Math.max(...quantites),
+                mode: mode,
+                plagePlusPolluee: Object.entries(plageStats).sort((a,b) => b[1].total - a[1].total)[0]?.[0] || 'Aucune',
+                parType: typeCount,
+                parPlage: plageStats
+            };
+        }
+        
+        function loadAndDisplayStats() {
+            const data = getData();
+            const stats = calculateStats(data);
+            
+            const container = document.getElementById('statsContainer');
+            if (!stats) {
+                container.innerHTML = '<p>Aucune donnée collectée pour le moment. Commencez par ajouter des données !</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total collectes</h3>
+                        <div class="value">${stats.totalObservations}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total déchets (kg)</h3>
+                        <div class="value">${stats.totalDechets} kg</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Moyenne par collecte</h3>
+                        <div class="value">${stats.moyenne} kg</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Médiane</h3>
+                        <div class="value">${stats.mediane} kg</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Minimum</h3>
+                        <div class="value">${stats.min} kg</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Maximum</h3>
+                        <div class="value">${stats.max} kg</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Déchet le plus fréquent</h3>
+                        <div class="value">${stats.mode}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Plage la plus polluée</h3>
+                        <div class="value">${stats.plagePlusPolluee}</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 30px;">📊 Répartition par type de déchet</h3>
+                ${generateTypeChart(stats.parType)}
+                
+                <h3 style="margin-top: 30px;">🏖️ Statistiques par plage</h3>
+                ${generatePlageTable(stats.parPlage)}
+            `;
+        }
+        
+        function generateTypeChart(parType) {
+            let html = '<table><thead><tr><th>Type de déchet</th><th>Fréquence</th><th>Pourcentage</th></tr></thead><tbody>';
+            const total = Object.values(parType).reduce((a,b) => a+b, 0);
+            for (let [type, count] of Object.entries(parType)) {
+                const percent = ((count / total) * 100).toFixed(1);
+                html += `<tr>
+                    <td>${type}</td>
+                    <td>${count}</td>
+                    <td>${percent}%</td>
+                </tr>`;
+            }
+            html += '</tbody></table>';
+            return html;
+        }
+        
+        function generatePlageTable(parPlage) {
+            let html = '<table><thead><tr><th>Plage</th><th>Nombre de collectes</th><th>Total déchets (kg)</th><th>Moyenne (kg)</th></tr></thead><tbody>';
+            for (let [plage, stats] of Object.entries(parPlage)) {
+                const moyenne = (stats.total / stats.count).toFixed(2);
+                html += `<tr>
+                    <td>${plage}</td>
+                    <td>${stats.count}</td>
+                    <td>${stats.total} kg</td>
+                    <td>${moyenne} kg</td>
+                </tr>`;
+            }
+            html += '</tbody></table>';
+            return html;
+        }
+        
+        function loadAndDisplayTable() {
+            const data = getData();
+            const container = document.getElementById('tableContainer');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<p>Aucune donnée collectée pour le moment.</p>';
+                return;
+            }
+            
+            // Trier par date (plus récent en premier)
+            const sortedData = [...data].sort((a,b) => new Date(b.date) - new Date(a.date));
+            
+            let html = `
+                <button onclick="exportToCSV()" style="margin-bottom: 15px; background: #28a745;">📥 Exporter en CSV</button>
+                <button onclick="clearAllData()" style="margin-bottom: 15px; margin-left: 10px; background: #dc3545;">🗑️ Effacer toutes les données</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Plage</th>
+                            <th>Quantité (kg)</th>
+                            <th>Type</th>
+                            <th>Bénévoles</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            sortedData.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.date}</td>
+                        <td>${item.plage}</td>
+                        <td>${item.quantite}</td>
+                        <td>${item.type}</td>
+                        <td>${item.benevoles}</td>
+                        <td><button onclick="deleteItem(${item.id})" style="background:#dc3545; padding:5px 10px;">❌</button></td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function deleteItem(id) {
+            let data = getData();
+            data = data.filter(item => item.id !== id);
+            saveData(data);
+            loadAndDisplayStats();
+            loadAndDisplayTable();
+            showTab('donnees');
+        }
+        
+        function clearAllData() {
+            if (confirm('⚠️ Êtes-vous sûr de vouloir effacer TOUTES les données ? Cette action est irréversible.')) {
+                saveData([]);
+                loadAndDisplayStats();
+                loadAndDisplayTable();
+                showTab('donnees');
+            }
+        }
+        
+        function exportToCSV() {
+            const data = getData();
+            if (data.length === 0) {
+                alert('Aucune donnée à exporter');
+                return;
+            }
+            
+            let csv = 'Date,Plage,Quantité (kg),Type de déchet,Nombre de bénévoles\n';
+            data.forEach(item => {
+                csv += `${item.date},${item.plage},${item.quantite},${item.type},${item.benevoles}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `eco-ocean_data_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+        
+        function showTab(tabName) {
+            // Cacher tous les contenus
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // Désactiver tous les boutons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Afficher l'onglet sélectionné
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Recharger les données si nécessaire
+            if (tabName === 'analyse') {
+                loadAndDisplayStats();
+            } else if (tabName === 'donnees') {
+                loadAndDisplayTable();
+            }
+        }
+        
+        // Rendre les fonctions globales
+        window.showTab = showTab;
+        window.deleteItem = deleteItem;
+        window.clearAllData = clearAllData;
+        window.exportToCSV = exportToCSV;
+    </script>
+</body>
+</html>
